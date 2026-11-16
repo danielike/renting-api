@@ -1,0 +1,38 @@
+# .NET build output
+**/bin/
+**/obj/
+.artifacts/
+artifacts/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# VS Code: ignore workspace state, but keep shared project settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Test output
+[Tt]est[Rr]esult*/
+*.trx
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Local secrets and environment settings
+.env
+.env.*
+!.env.example
+secrets.json
