@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RentingApi.Api/RentingApi.Api.csproj" />
+    <Project Path="src/RentingApi.Application/RentingApi.Application.csproj" />
+    <Project Path="src/RentingApi.Domain/RentingApi.Domain.csproj" />
+    <Project Path="src/RentingApi.Infrastructure/RentingApi.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RentingApi.Api.Tests/RentingApi.Api.Tests.csproj" />
+    <Project Path="tests/RentingApi.Application.Tests/RentingApi.Application.Tests.csproj" />
+    <Project Path="tests/RentingApi.Domain.Tests/RentingApi.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
