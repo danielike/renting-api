@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Scalar.AspNetCore;
 using RentingApi.Application.Abstractions;
 using RentingApi.Infrastructure;
 using RentingApi.Api.Errors;
@@ -44,5 +45,11 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Add Scalar API documentation for each API version
+app.MapScalarApiReference(options =>
+{
+    options.WithTitle("RentingApi");
+});
 
 app.Run();
