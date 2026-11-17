@@ -1,4 +1,3 @@
-using System;
 using RentingApi.Domain.Exceptions;
 
 namespace RentingApi.Domain.Entities;
@@ -14,8 +13,6 @@ public class Rental
     public DateTime RentalStartDate { get; }
     public DateTime? RentalEndDate { get; set; }
     public RentalStatus Status { get; private set; }
-
-    private Rental() { }
 
     public Rental(Guid id, Guid vehicleId, Guid customerId, DateTime rentalStartDate)
     {

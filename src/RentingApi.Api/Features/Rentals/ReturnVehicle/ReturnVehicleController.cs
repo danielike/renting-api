@@ -33,7 +33,10 @@ public class ReturnVehicleController : ControllerBase
         Guid rentalId,
         CancellationToken cancellationToken)
     {
-        var command = new ReturnVehicleCommand(rentalId, rentalId);
+        // Get the rental to find the associated vehicle
+        var vehicleId = await _mediator.Query<ReturnVehicleQuery, Guid>(new ReturnVehicleQuery(rentalId), cancellationToken);
+
+        var command = new ReturnVehicleCommand(rentalId, vehicleId);
         await _mediator.Send<ReturnVehicleCommand>(command, cancellationToken);
         return Ok(new ReturnVehicleResponse("Vehicle returned successfully."));
     }

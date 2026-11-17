@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using RentingApi.Application.Ports.Output;
 using RentingApi.Domain.Entities;
 
@@ -30,7 +25,7 @@ public class InMemoryVehicleRepository : IVehicleRepository
     public Task<IEnumerable<Vehicle>> ListAvailableAsync(CancellationToken cancellationToken)
     {
         var vehicles = _vehicles.Values.Where(v => v.Status == VehicleStatus.Available);
-        return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
+        return Task.FromResult(vehicles);
     }
 
     public Task<Vehicle?> GetByLicensePlateAsync(string licensePlate, CancellationToken cancellationToken)

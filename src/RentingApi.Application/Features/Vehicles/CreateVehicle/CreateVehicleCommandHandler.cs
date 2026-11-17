@@ -11,7 +11,7 @@ namespace RentingApi.Application.Features.Vehicles.CreateVehicle;
 /// <summary>
 /// Handler for creating a new vehicle in the fleet.
 /// </summary>
-internal sealed class CreateVehicleCommandHandler : ICommandHandler<CreateVehicleCommand, Guid>
+public sealed class CreateVehicleCommandHandler : ICommandHandler<CreateVehicleCommand, Guid>
 {
     private readonly IVehicleRepository _vehicleRepository;
 

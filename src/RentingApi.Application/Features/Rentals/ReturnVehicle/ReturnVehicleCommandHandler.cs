@@ -10,7 +10,7 @@ namespace RentingApi.Application.Features.Rentals.ReturnVehicle;
 /// <summary>
 /// Handler for returning a rented vehicle.
 /// </summary>
-internal sealed class ReturnVehicleCommandHandler : ICommandHandler<ReturnVehicleCommand>
+public sealed class ReturnVehicleCommandHandler : ICommandHandler<ReturnVehicleCommand>
 {
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IRentalRepository _rentalRepository;

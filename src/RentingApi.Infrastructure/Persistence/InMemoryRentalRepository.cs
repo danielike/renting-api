@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using RentingApi.Application.Ports.Output;
 using RentingApi.Domain.Entities;
 
@@ -31,7 +26,7 @@ public class InMemoryRentalRepository : IRentalRepository
     {
         var rentals = _rentals.Values.Where(r =>
             r.CustomerId == customerId && r.Status == RentalStatus.Active);
-        return Task.FromResult<IEnumerable<Rental>>(rentals);
+        return Task.FromResult(rentals);
     }
 
     public Task<Rental?> GetActiveRentalByVehicleIdAsync(Guid vehicleId, CancellationToken cancellationToken)

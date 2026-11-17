@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using RentingApi.Application.Abstractions;
 using RentingApi.Application.Dtos;
 using RentingApi.Application.Ports.Output;
@@ -12,7 +8,7 @@ namespace RentingApi.Application.Features.Vehicles.ListVehicles;
 /// <summary>
 /// Handler for listing available vehicles.
 /// </summary>
-internal sealed class ListVehiclesQueryHandler : IQueryHandler<ListVehiclesQuery, IEnumerable<VehicleDto>>
+public sealed class ListVehiclesQueryHandler : IQueryHandler<ListVehiclesQuery, IEnumerable<VehicleDto>>
 {
     private readonly IVehicleRepository _vehicleRepository;
 

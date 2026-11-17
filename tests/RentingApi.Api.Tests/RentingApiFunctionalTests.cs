@@ -1,22 +1,36 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
-using RentingApi.Domain.Entities;
-using RentingApi.Infrastructure.Persistence;
+using RentingApi.Api.Features.Rentals.ReturnVehicle;
+using RentingApi.Api.Features.Rentals.CreateRental;
+using RentingApi.Api.Features.Vehicles.CreateVehicle;
+using RentingApi.Api.Features.Vehicles.Shared;
+using RentingApi.Application.Dtos;
 
 namespace RentingApi.Api.Tests;
 
 /// <summary>
 /// Functional tests for the API using WebApplicationFactory.
+/// Uses REAL DTOs from the API project to ensure contract changes are detected.
 /// </summary>
-public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Program>>
+public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
-    public RentingApiFunctionalTests(WebApplicationFactory<Program> factory)
+    public RentingApiFunctionalTests(CustomWebApplicationFactory factory)
     {
-        _factory = factory;
-        _client = factory.CreateClient();
+        _client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
     }
+
+    private StringContent JsonContent(object obj) =>
+        new(JsonSerializer.Serialize(obj), Encoding.UTF8, "application/json");
+
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     [Fact]
     public async Task POST_CreateVehicle_Returns201WithVehicleId()
@@ -32,14 +46,13 @@ public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Pro
         };
 
         // Act
-        var response = await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+        var response = await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(request));
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<CreateVehicleResponse>();
-        body.Should().NotBeNull();
-        body!.Id.Should().NotBeEmpty();
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
+        Assert.NotNull(body);
+        Assert.NotEqual(Guid.Empty, body!.Id);
     }
 
     [Fact]
@@ -56,14 +69,13 @@ public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Pro
         };
 
         // Act
-        var response = await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+        var response = await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(request));
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
-        var body = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-        body.Should().NotBeNull();
-        body!.Detail.Should().Contain("older than 5 years");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<ErrorResponse>(JsonOptions);
+        Assert.NotNull(body);
+        Assert.Contains("older than 5 years", body!.Detail);
     }
 
     [Fact]
@@ -79,18 +91,18 @@ public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Pro
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(createRequest), System.Text.Encoding.UTF8, "application/json"));
+        await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(createRequest));
 
         // Act
         var response = await _client.GetAsync("/api/v1/ListVehicles");
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var vehicles = await response.Content.ReadFromJsonAsync<List<VehicleDto>>();
-        vehicles.Should().NotBeNull();
-        vehicles!.Count.Should().BeGreaterOrEqualTo(1);
-        vehicles.Should().Contain(v => v.LicensePlate == "TEST-002");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var vehicles = JsonSerializer.Deserialize<List<VehicleDto>>(
+            await response.Content.ReadAsStringAsync(), JsonOptions);
+        Assert.NotNull(vehicles);
+        Assert.True(vehicles!.Count >= 1);
+        Assert.Contains(vehicles, v => v.LicensePlate == "TEST-002");
     }
 
     [Fact]
@@ -106,17 +118,16 @@ public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Pro
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+        await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(request));
 
         // Act
-        var response = await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json"));
+        var response = await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(request));
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
-        var body = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-        body!.Detail.Should().Contain("already exists");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<ErrorResponse>(JsonOptions);
+        Assert.NotNull(body);
+        Assert.Contains("already exists", body!.Detail);
     }
 
     [Fact]
@@ -132,20 +143,18 @@ public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Pro
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        var createResponse = await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(createRequest), System.Text.Encoding.UTF8, "application/json"));
-        var vehicle = await createResponse.Content.ReadFromJsonAsync<CreateVehicleResponse>();
+        var createResponse = await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(createRequest));
+        var vehicle = await createResponse.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
         // Act
         var rentalRequest = new { customerId = Guid.NewGuid() };
-        var response = await _client.PostAsync($"/api/v1/vehicles/{vehicle!.Id}/rentals",
-            new StringContent(JsonSerializer.Serialize(rentalRequest), System.Text.Encoding.UTF8, "application/json"));
+        var response = await _client.PostAsync($"/api/v1/vehicles/{vehicle!.Id}/rentals", JsonContent(rentalRequest));
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<CreateRentalResponse>();
-        body.Should().NotBeNull();
-        body!.RentalId.Should().NotBeEmpty();
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<CreateRentalResponse>(JsonOptions);
+        Assert.NotNull(body);
+        Assert.NotEqual(Guid.Empty, body!.RentalId);
     }
 
     [Fact]
@@ -172,27 +181,28 @@ public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Pro
 
         var customer = Guid.NewGuid();
 
-        var v1 = await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(vehicle1Request), System.Text.Encoding.UTF8, "application/json"));
-        var v1Data = await v1.Content.ReadFromJsonAsync<CreateVehicleResponse>();
+        var v1 = await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(vehicle1Request));
+        var v1Data = await v1.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
-        var v2 = await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(vehicle2Request), System.Text.Encoding.UTF8, "application/json"));
-        var v2Data = await v2.Content.ReadFromJsonAsync<CreateVehicleResponse>();
+        var v2 = await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(vehicle2Request));
+        var v2Data = await v2.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
         // Rent first vehicle
-        var r1 = await _client.PostAsync($"/api/v1/vehicles/{v1Data!.Id}/rentals",
-            new StringContent(JsonSerializer.Serialize(new { customerId = customer }), System.Text.Encoding.UTF8, "application/json"));
-        r1.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+        var r1 = await _client.PostAsync(
+            $"/api/v1/vehicles/{v1Data!.Id}/rentals",
+            JsonContent(new { customerId = customer }));
+        Assert.Equal(HttpStatusCode.Created, r1.StatusCode);
 
         // Act - rent second vehicle with same customer
-        var r2 = await _client.PostAsync($"/api/v1/vehicles/{v2Data!.Id}/rentals",
-            new StringContent(JsonSerializer.Serialize(new { customerId = customer }), System.Text.Encoding.UTF8, "application/json"));
+        var r2 = await _client.PostAsync(
+            $"/api/v1/vehicles/{v2Data!.Id}/rentals",
+            JsonContent(new { customerId = customer }));
 
         // Assert
-        r2.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
-        var body = await r2.Content.ReadFromJsonAsync<ErrorResponse>();
-        body!.Detail.Should().Contain("already has an active rental");
+        Assert.Equal(HttpStatusCode.BadRequest, r2.StatusCode);
+        var body = await r2.Content.ReadFromJsonAsync<ErrorResponse>(JsonOptions);
+        Assert.NotNull(body);
+        Assert.Contains("already has an active rental", body!.Detail);
     }
 
     [Fact]
@@ -208,29 +218,24 @@ public class RentingApiFunctionalTests : IClassFixture<WebApplicationFactory<Pro
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        var createResponse = await _client.PostAsync("/api/v1/CreateVehicle",
-            new StringContent(JsonSerializer.Serialize(createRequest), System.Text.Encoding.UTF8, "application/json"));
-        var vehicle = await createResponse.Content.ReadFromJsonAsync<CreateVehicleResponse>();
+        var createResponse = await _client.PostAsync("/api/v1/CreateVehicle", JsonContent(createRequest));
+        var vehicle = await createResponse.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
         var rentalRequest = new { customerId = Guid.NewGuid() };
-        var rentalResponse = await _client.PostAsync($"/api/v1/vehicles/{vehicle!.Id}/rentals",
-            new StringContent(JsonSerializer.Serialize(rentalRequest), System.Text.Encoding.UTF8, "application/json"));
-        var rental = await rentalResponse.Content.ReadFromJsonAsync<CreateRentalResponse>();
+        var rentalResponse = await _client.PostAsync(
+            $"/api/v1/vehicles/{vehicle!.Id}/rentals",
+            JsonContent(rentalRequest));
+        var rental = await rentalResponse.Content.ReadFromJsonAsync<CreateRentalResponse>(JsonOptions);
 
         // Act
-        var returnResponse = await _client.PostAsync($"/api/v1/rentals/{rental!.RentalId}/return",
-            new StringContent("{}", System.Text.Encoding.UTF8, "application/json"));
+        var returnResponse = await _client.PostAsync(
+            $"/api/v1/rentals/{rental!.RentalId}/return",
+            JsonContent(new { }));
 
         // Assert
-        returnResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var body = await returnResponse.Content.ReadFromJsonAsync<ReturnVehicleResponse>();
-        body!.Message.Should().Contain("returned successfully");
+        Assert.Equal(HttpStatusCode.OK, returnResponse.StatusCode);
+        var body = await returnResponse.Content.ReadFromJsonAsync<ReturnVehicleResponse>(JsonOptions);
+        Assert.NotNull(body);
+        Assert.Contains("returned successfully", body!.Message);
     }
-
-    // Response DTOs
-    private record CreateVehicleResponse(Guid Id);
-    private record ErrorResponse(string Title, string Detail);
-    private record VehicleDto(Guid Id, string LicensePlate, string Brand, string Model, int Year, string Status);
-    private record CreateRentalResponse(Guid RentalId);
-    private record ReturnVehicleResponse(string Message);
 }

@@ -12,7 +12,7 @@ namespace RentingApi.Application.Features.Rentals.CreateRental;
 /// <summary>
 /// Handler for creating a new rental.
 /// </summary>
-internal sealed class CreateRentalCommandHandler : ICommandHandler<CreateRentalCommand, Guid>
+public sealed class CreateRentalCommandHandler : ICommandHandler<CreateRentalCommand, Guid>
 {
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IRentalRepository _rentalRepository;
