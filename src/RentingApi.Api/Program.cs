@@ -1,12 +1,25 @@
+using System.Text.Json;
 using RentingApi.Application.Abstractions;
 using RentingApi.Infrastructure;
 using RentingApi.Api.Errors;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Http.Json;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.AddScoped<Mediator>();
 builder.Services.AddInfrastructure();
 builder.Services.AddExceptionHandler<DomainExceptionHandler>();
@@ -25,7 +38,17 @@ builder.Services.AddApiVersioning(options =>
         options.SubstituteApiVersionInUrl = true;
     })
     .AddMvc()
-    .AddOpenApi();   // ← THIS is the Asp.Versioning overload, not Microsoft.AspNetCore.OpenApi
+    .AddOpenApi(options =>
+    {
+        options.Document.AddOperationTransformer((operation, context, ct) =>
+        {
+            if (!string.IsNullOrEmpty(operation.OperationId))
+            {
+                operation.OperationId = char.ToLowerInvariant(operation.OperationId[0]) + operation.OperationId[1..];
+            }
+            return Task.CompletedTask;
+        });
+    });   // ← THIS is the Asp.Versioning overload, not Microsoft.AspNetCore.OpenApi
 
 var app = builder.Build();
 

@@ -21,7 +21,7 @@ public sealed class CreateVehicleCommandHandler : ICommandHandler<CreateVehicleC
     {
         // Check if a vehicle with the same license plate already exists
         var existing = await _vehicleRepository.GetByLicensePlateAsync(command.LicensePlate, cancellationToken);
-        if (existing != null)
+        if (existing is not null)
         {
             throw new DomainException($"A vehicle with license plate '{command.LicensePlate}' already exists.");
         }

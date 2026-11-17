@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using RentingApi.Api.Features.Rentals.ReturnVehicle;
 using RentingApi.Api.Features.Vehicles.Shared;
@@ -10,7 +11,8 @@ namespace RentingApi.Api.Features.Rentals;
 /// Controller for returning rented vehicles.
 /// </summary>
 [ApiController]
-[Route("api/v1/rentals/{rentalId}/return")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}")]
 public class ReturnVehicleController : ControllerBase
 {
     private readonly Mediator _mediator;
@@ -26,7 +28,7 @@ public class ReturnVehicleController : ControllerBase
     /// <param name="rentalId">The rental to return</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Confirmation message</returns>
-    [HttpPost]
+    [HttpPost("/rentals/{rentalId:guid}/return")]
     [ProducesResponseType(typeof(ReturnVehicleResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ReturnVehicle(

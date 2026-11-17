@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using RentingApi.Application.Dtos;
 using RentingApi.Application.Abstractions;
@@ -9,7 +10,8 @@ namespace RentingApi.Api.Features.Vehicles.ListVehicles;
 /// Controller for listing available vehicles.
 /// </summary>
 [ApiController]
-[Route("api/v1/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}")]
 public class ListVehiclesController : ControllerBase
 {
     private readonly Mediator _mediator;
@@ -24,7 +26,7 @@ public class ListVehiclesController : ControllerBase
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of available vehicles</returns>
-    [HttpGet]
+    [HttpGet("/vehicles")]
     [ProducesResponseType(typeof(IEnumerable<VehicleDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListVehicles(CancellationToken cancellationToken)
     {

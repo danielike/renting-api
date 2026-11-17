@@ -22,7 +22,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(vehicleRepoDesc);
 
             var rentalRepoDesc = services.FirstOrDefault(d => d.ServiceType == typeof(IRentalRepository));
-            if (rentalRepoDesc != null)
+            if (rentalRepoDesc is not null)
                 services.Remove(rentalRepoDesc);
 
             // Register as singletons to persist across requests

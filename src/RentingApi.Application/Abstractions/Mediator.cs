@@ -22,7 +22,7 @@ public sealed class Mediator
         var handlerType = typeof(ICommandHandler<TCommand, TResult>);
         var handler = _serviceProvider.GetService(handlerType);
 
-        if (handler == null)
+        if (handler is null)
         {
             throw new InvalidOperationException(
                 $"No handler registered for command '{typeof(TCommand).Name}'. " +
@@ -41,7 +41,7 @@ public sealed class Mediator
         var handlerType = typeof(ICommandHandler<TCommand>);
         var handler = _serviceProvider.GetService(handlerType);
 
-        if (handler == null)
+        if (handler is null)
         {
             throw new InvalidOperationException(
                 $"No handler registered for command '{typeof(TCommand).Name}'. " +
@@ -60,7 +60,7 @@ public sealed class Mediator
         var handlerType = typeof(IQueryHandler<TQuery, TResult>);
         var handler = _serviceProvider.GetService(handlerType);
 
-        if (handler == null)
+        if (handler is null)
         {
             throw new InvalidOperationException(
                 $"No handler registered for query '{typeof(TQuery).Name}'. " +

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using RentingApi.Application.Abstractions;
 using RentingApi.Application.Features.Vehicles.CreateVehicle;
@@ -9,7 +10,8 @@ namespace RentingApi.Api.Features.Vehicles.CreateVehicle;
 /// Controller for vehicle creation.
 /// </summary>
 [ApiController]
-[Route("api/v1/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}")]
 public class CreateVehicleController : ControllerBase
 {
     private readonly Mediator _mediator;
@@ -25,7 +27,7 @@ public class CreateVehicleController : ControllerBase
     /// <param name="request">Vehicle details</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The created vehicle ID</returns>
-    [HttpPost]
+    [HttpPost("/vehicles")]
     [ProducesResponseType(typeof(CreateVehicleResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateVehicle(

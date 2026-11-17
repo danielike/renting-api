@@ -23,7 +23,7 @@ public sealed class ReturnVehicleCommandHandler : ICommandHandler<ReturnVehicleC
     {
         // Check if the rental exists and is active
         var rental = await _rentalRepository.GetByIdAsync(command.RentalId, cancellationToken);
-        if (rental == null)
+        if (rental is null)
         {
             throw new DomainException($"Rental with ID '{command.RentalId}' not found.");
         }
@@ -42,7 +42,7 @@ public sealed class ReturnVehicleCommandHandler : ICommandHandler<ReturnVehicleC
 
         // Check if the vehicle exists and is rented
         var vehicle = await _vehicleRepository.GetByIdAsync(command.VehicleId, cancellationToken);
-        if (vehicle == null)
+        if (vehicle is null)
         {
             throw new DomainException($"Vehicle with ID '{command.VehicleId}' not found.");
         }
