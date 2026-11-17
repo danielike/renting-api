@@ -28,7 +28,7 @@ public class ReturnVehicleController : ControllerBase
     /// <param name="rentalId">The rental to return</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Confirmation message</returns>
-    [HttpPost("/rentals/{rentalId:guid}/return")]
+    [HttpPost("rentals/{rentalId:guid}/return")]
     [ProducesResponseType(typeof(ReturnVehicleResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ReturnVehicle(

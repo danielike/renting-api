@@ -29,7 +29,7 @@ public class CreateRentalController : ControllerBase
     /// <param name="request">Customer information</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The created rental ID</returns>
-    [HttpPost("/vehicles/{vehicleId:guid}/rentals")]
+    [HttpPost("vehicles/{vehicleId:guid}/rentals")]
     [ProducesResponseType(typeof(CreateRentalResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRental(

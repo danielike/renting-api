@@ -26,7 +26,7 @@ public class ListVehiclesController : ControllerBase
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of available vehicles</returns>
-    [HttpGet("/vehicles")]
+    [HttpGet("vehicles")]
     [ProducesResponseType(typeof(IEnumerable<VehicleDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListVehicles(CancellationToken cancellationToken)
     {

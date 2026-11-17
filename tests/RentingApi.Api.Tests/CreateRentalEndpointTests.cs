@@ -40,7 +40,7 @@ public class CreateRentalEndpointTests : IClassFixture<CustomWebApplicationFacto
             new DateTime(2020, 1, 15));
         // Act
         await _client.PostAsync($"/vehicles", JsonContent(vehicle));
-        var response = await _client.PostAsync($"/vehicles/{vehicle.Id}/rentals", JsonContent(customerId));
+        var response = await _client.PostAsync($"/api/v1/vehicles/{vehicle.Id}/rentals", JsonContent(customerId));
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<ErrorResponse>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

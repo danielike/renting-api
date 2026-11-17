@@ -16,6 +16,7 @@ namespace RentingApi.Api.Tests;
 /// </summary>
 public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFactory>
 {
+    private const string ApiEndpoint = "/api/v1";
     private const string VehicleEndpoint = "/vehicles";
     private const string ReturnVehicleEndpoint = "/rentals/{0}/return";
     private const string RentVehicleEndpoint = "/vehicles/{0}/rentals";
@@ -48,7 +49,7 @@ public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFacto
         };
 
         // Act
-        var response = await _client.PostAsync(VehicleEndpoint, JsonContent(request));
+        var response = await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(request));
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -71,7 +72,7 @@ public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFacto
         };
 
         // Act
-        var response = await _client.PostAsync(VehicleEndpoint, JsonContent(request));
+        var response = await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(request));
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -93,10 +94,10 @@ public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFacto
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        await _client.PostAsync(VehicleEndpoint, JsonContent(createRequest));
+        await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(createRequest));
 
         // Act
-        var response = await _client.GetAsync(VehicleEndpoint);
+        var response = await _client.GetAsync(ApiEndpoint + VehicleEndpoint);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -120,10 +121,10 @@ public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFacto
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        await _client.PostAsync(VehicleEndpoint, JsonContent(request));
+        await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(request));
 
         // Act
-        var response = await _client.PostAsync(VehicleEndpoint, JsonContent(request));
+        var response = await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(request));
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -145,12 +146,12 @@ public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFacto
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        var createResponse = await _client.PostAsync(VehicleEndpoint, JsonContent(createRequest));
+        var createResponse = await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(createRequest));
         var vehicle = await createResponse.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
         // Act
         var rentalRequest = new { customerId = Guid.NewGuid() };
-        var response = await _client.PostAsync(string.Format(RentVehicleEndpoint, vehicle!.Id), JsonContent(rentalRequest));
+        var response = await _client.PostAsync(string.Format(ApiEndpoint + RentVehicleEndpoint, vehicle!.Id), JsonContent(rentalRequest));
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -183,18 +184,18 @@ public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFacto
 
         var customer = Guid.NewGuid();
 
-        var v1 = await _client.PostAsync(VehicleEndpoint, JsonContent(vehicle1Request));
+        var v1 = await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(vehicle1Request));
         var v1Data = await v1.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
-        var v2 = await _client.PostAsync(VehicleEndpoint, JsonContent(vehicle2Request));
+        var v2 = await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(vehicle2Request));
         var v2Data = await v2.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
         // Rent first vehicle
-        var r1 = await _client.PostAsync(string.Format(RentVehicleEndpoint, v1Data!.Id), JsonContent(new { customerId = customer }));
+        var r1 = await _client.PostAsync(string.Format(ApiEndpoint + RentVehicleEndpoint, v1Data!.Id), JsonContent(new { customerId = customer }));
         Assert.Equal(HttpStatusCode.Created, r1.StatusCode);
 
         // Act - rent second vehicle with same customer
-        var r2 = await _client.PostAsync(string.Format(RentVehicleEndpoint, v2Data!.Id), JsonContent(new { customerId = customer }));
+        var r2 = await _client.PostAsync(string.Format(ApiEndpoint + RentVehicleEndpoint, v2Data!.Id), JsonContent(new { customerId = customer }));
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, r2.StatusCode);
@@ -216,15 +217,15 @@ public class RentingApiFunctionalTests : IClassFixture<CustomWebApplicationFacto
             manufactureDate = "2024-01-15T00:00:00Z"
         };
 
-        var createResponse = await _client.PostAsync(VehicleEndpoint, JsonContent(createRequest));
+        var createResponse = await _client.PostAsync(ApiEndpoint + VehicleEndpoint, JsonContent(createRequest));
         var vehicle = await createResponse.Content.ReadFromJsonAsync<CreateVehicleResponse>(JsonOptions);
 
         var rentalRequest = new { customerId = Guid.NewGuid() };
-        var rentalResponse = await _client.PostAsync(string.Format(RentVehicleEndpoint, vehicle!.Id), JsonContent(rentalRequest));
+        var rentalResponse = await _client.PostAsync(string.Format(ApiEndpoint + RentVehicleEndpoint, vehicle!.Id), JsonContent(rentalRequest));
         var rental = await rentalResponse.Content.ReadFromJsonAsync<CreateRentalResponse>(JsonOptions);
 
         // Act
-        var returnResponse = await _client.PostAsync(string.Format(ReturnVehicleEndpoint, rental!.RentalId), JsonContent(new { }));
+        var returnResponse = await _client.PostAsync(string.Format(ApiEndpoint + ReturnVehicleEndpoint, rental!.RentalId), JsonContent(new { }));
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, returnResponse.StatusCode);

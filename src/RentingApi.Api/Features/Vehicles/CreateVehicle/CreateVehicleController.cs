@@ -27,7 +27,7 @@ public class CreateVehicleController : ControllerBase
     /// <param name="request">Vehicle details</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The created vehicle ID</returns>
-    [HttpPost("/vehicles")]
+    [HttpPost("vehicles")]
     [ProducesResponseType(typeof(CreateVehicleResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateVehicle(
