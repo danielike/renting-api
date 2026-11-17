@@ -16,8 +16,6 @@ public class Vehicle
     public VehicleStatus Status { get; private set; }
     public Guid? CurrentRentalId { get; private set; }
 
-    private Vehicle() { }
-
     public Vehicle(Guid id, string licensePlate, string brand, string model, int year, DateTime manufactureDate)
     {
         if (string.IsNullOrWhiteSpace(licensePlate))
@@ -31,6 +29,9 @@ public class Vehicle
 
         if (year < 1900 || year > DateTime.UtcNow.Year + 1)
             throw new DomainException("Invalid vehicle year.");
+        
+        if (year < manufactureDate.Year)
+            throw new DomainException("Year cannot be less than ManufactureDate.");
 
         if (manufactureDate > DateTime.UtcNow)
             throw new DomainException("Manufacture date cannot be in the future.");

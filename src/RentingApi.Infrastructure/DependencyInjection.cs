@@ -17,8 +17,8 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         // Register in-memory repositories (swap for real implementations in production)
-        services.AddScoped<IVehicleRepository, InMemoryVehicleRepository>();
-        services.AddScoped<IRentalRepository, InMemoryRentalRepository>();
+        services.AddSingleton<IVehicleRepository, InMemoryVehicleRepository>();
+        services.AddSingleton<IRentalRepository, InMemoryRentalRepository>();
 
         // Register command/query handlers
         services.AddScoped<ICommandHandler<CreateRentalCommand, Guid>, CreateRentalCommandHandler>();

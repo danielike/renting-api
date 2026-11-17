@@ -33,6 +33,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi().WithDocumentPerVersion();  // ← one document per version
     app.MapScalarApiReference();
+    app.MapGet("/", () => Results.Redirect("/scalar"));
 }
 
 app.UseExceptionHandler();

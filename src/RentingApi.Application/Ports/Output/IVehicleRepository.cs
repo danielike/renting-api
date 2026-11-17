@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using RentingApi.Domain.Entities;
 
 namespace RentingApi.Application.Ports.Output;

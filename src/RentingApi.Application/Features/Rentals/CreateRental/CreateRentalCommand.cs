@@ -1,4 +1,3 @@
-using System;
 using RentingApi.Application.Abstractions;
 
 namespace RentingApi.Application.Features.Rentals.CreateRental;
